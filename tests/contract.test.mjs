@@ -41,8 +41,8 @@ test('internal provenance digests retain the signer and 24 shared GAS bodies',()
   assert.equal(Object.keys(p.sharedFunctionBodies).length,24)
 })
 
-test('four consumer subsets exclude each other’s unique vocabulary',()=>{
-  assert.deepEqual(CONSUMERS,['web','expense-pwa','partner-ledger','solo-ledger'])
+test('three active consumer subsets exclude each other’s unique vocabulary',()=>{
+  assert.deepEqual(CONSUMERS,['web','partner-ledger','solo-ledger'])
   assert.equal(requireTerm('partner-ledger','付款人'),'付款人')
   assert.equal(requireTerm('solo-ledger','借方帳戶'),'借方帳戶')
   assert.throws(()=>requireTerm('partner-ledger','借方帳戶'),/outside/)
@@ -69,22 +69,27 @@ test('source-backed ordered headers and field shapes reject excluded or mistyped
   assert.throws(()=>assertShape('partner-ledger','Transaction',{...partner,'借方帳戶':'cash'}),/outside/)
   assert.throws(()=>assertShape('solo-ledger','Transaction',partner),/invalid type|outside/)
   assert.equal(assertShape('solo-ledger','Transaction',{type:'支出',amount:25,date:'2026-01-01',description:'test',account:'dynamic name'}),true)
-  assert.equal(assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'dynamic category',description:'test'}),true)
-  assert.throws(()=>assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'x',description:'test',paymentMethod:5}),/invalid paymentMethod/)
   for(const consumer of CONSUMERS) for(const inherited of ['toString','constructor','__proto__']) {
     assert.throws(()=>assertShape(consumer,inherited,{}),/outside/)
   }
-  assert.throws(()=>assertShape('expense-pwa','unknown',{}),/shape unknown is outside expense-pwa vocabulary/)
   assert.throws(()=>assertShape('__proto__','toString',{}),/outside/)
   assert.throws(()=>requireTerm('__proto__','payer'),/outside/)
   assert.throws(()=>assertShape('toString','Expense',{}),/outside/)
   assert.throws(()=>requireTerm('constructor','payer'),/outside/)
 })
 
+test('retired expense-pwa cannot use active vocabulary or receive generated artifacts',()=>{
+  assert.throws(()=>requireTerm('expense-pwa','payer'),/outside contract inventory/)
+  assert.throws(()=>assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'food',description:'test'}),/outside contract inventory/)
+  const artifacts=expectedArtifacts()
+  assert.equal(artifacts.has('generated/expense-pwa/vocabulary.ts'),false)
+  assert.equal(artifacts.has('generated/expense-pwa/envelope.ts'),false)
+})
+
 test('generation is deterministic and GAS has no module imports',()=>{
   const once=expectedArtifacts(), twice=expectedArtifacts()
   assert.deepEqual([...once],[...twice])
-  assert.equal(once.size,10)
+  assert.equal(once.size,CONSUMERS.length * 2 + 2)
   for(const [name,body] of once){
     assert.ok(body.endsWith('\n'),name)
     assert.equal(body.includes('\r'),false,name)
@@ -96,7 +101,6 @@ test('generation is deterministic and GAS has no module imports',()=>{
   assert.match(once.get('generated/solo-ledger/vocabulary.ts'),/TRANSACTION_TYPES/)
   assert.match(once.get('generated/partner-ledger/vocabulary.ts'),/export type Transaction/)
   assert.match(once.get('generated/solo-ledger/vocabulary.ts'),/"iou"\?:/)
-  assert.match(once.get('generated/expense-pwa/vocabulary.ts'),/export type Expense/)
   assert.match(once.get('generated/web/vocabulary.ts'),/export type DetailRow/)
   assert.deepEqual(JSON.parse(vectors.find(x=>x.id==='alternate-compact').payloadUtf8),JSON.parse(vectors.find(x=>x.id==='alternate-spaced').payloadUtf8))
   for(const consumer of ['partner-ledger','solo-ledger']){

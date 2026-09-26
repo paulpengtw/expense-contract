@@ -11,14 +11,12 @@ export const COMMON_TERMS = ['txn_id', '日期', '金額', '分類', '交易對�
 export const PARTNER_TERMS = ['付款人', '分攤方式', '記帳人'] as const
 export const SOLO_TERMS = ['時間', '類型', '借方帳戶', '貸方帳戶', '幣別', '說明', '結清狀態', '建立時間'] as const
 export const WEB_TERMS = [...new Set([...WEB_DETAIL_HEADER, ...WEB_ACCOUNT_HEADER])] as const
-export const PWA_TERMS = ['payer', 'bearer', 'amount', 'currency', 'category', 'description', 'paymentMethod'] as const
 export const PARTNER_SPLIT_MODES = ['這筆平分', '幫狗狗付', '幫自己付'] as const
 export const SOLO_TRANSACTION_TYPES = ['支出', '收入', '轉帳'] as const
 export const SOLO_IOU_TYPES = ['應收', '應付'] as const
 
 export const CONSUMER_TERMS: Record<Consumer, readonly string[]> = {
   web: WEB_TERMS,
-  'expense-pwa': PWA_TERMS,
   'partner-ledger': [...COMMON_TERMS, ...PARTNER_TERMS],
   'solo-ledger': [...COMMON_TERMS, ...SOLO_TERMS],
 }
@@ -33,12 +31,6 @@ export const CONSUMER_SHAPES = {
   web: {
     DetailRow: webDetailFields,
     AccountRow: webAccountFields,
-  },
-  'expense-pwa': {
-    Expense: {
-      payer: string, bearer: string, amount: number, currency: string,
-      category: string, description: string, paymentMethod: optionalString,
-    },
   },
   'partner-ledger': {
     Transaction: {
