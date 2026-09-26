@@ -1,0 +1,7 @@
+# Expense contract
+
+Standalone source for the household envelope and vocabulary. `spec/envelope.md` is normative. `src/envelope.ts` is the byte-identical signer from the two local ledgers and the pinned PWA source; `src/verify.gs` preserves the 24 shared Apps Script function bodies. `src/provenance.json` records body digests. Generated copies are committed under `generated/`. Generated GAS includes seven wire functions and the skew constant; the consumer supplies its domain `route_` callback and Apps Script host services. Backup and sheet domain helpers stay in the consumer. Vocabulary projections are unordered term sets, not sheet header arrays.
+
+Use Node 26.5.0 (`.nvmrc`), then `npm run ci` for the frozen-install local gate, or `npm ci` and `npm run check` for individual checks. `npm run generate` deliberately updates generated artifacts; checks only compare expected bytes and never rewrite them. `npm run vectors:author` deliberately rewrites synthetic vectors and digests; tests never run it.
+
+Local synthetic checks can prove fixture compatibility, deterministic generation and the behavior of the extracted verifier under host shims. Cloud Actions, a published contract revision, consumer pin/adoption, real Apps Script storage tests and release rehearsal are still unverified. Current ledger replay gaps are recorded in `spec/envelope.md`; adapter passing is not a production durability claim. No live signing keys or financial records belong here.

@@ -1,0 +1,293 @@
+[
+  {
+    "id": "health",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.health.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "health",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "blzB6yoLcwNn8xPnBbhfc6RDIqc1SxgcFuyorFV4BBA"
+    },
+    "expected": "accept",
+    "wrongAnswer": "signing a digest or reserialized value"
+  },
+  {
+    "id": "non-ascii",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"create\",\"description\":\"晚餐🍜\"}",
+    "payloadBytesHex": "7b22616374696f6e223a22637265617465222c226465736372697074696f6e223a22e6999ae9a490f09f8d9c227d",
+    "signingInput": "1700000000.non-ascii.eyJhY3Rpb24iOiJjcmVhdGUiLCJkZXNjcmlwdGlvbiI6IuaZmumkkPCfjZwifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "non-ascii",
+      "payload": "eyJhY3Rpb24iOiJjcmVhdGUiLCJkZXNjcmlwdGlvbiI6IuaZmumkkPCfjZwifQ",
+      "sig": "qFXtq0iGZ-_uDIeNhOyg9El3FrzgievL8XBRvq0cD7k"
+    },
+    "expected": "accept",
+    "wrongAnswer": "incorrect UTF-8 handling"
+  },
+  {
+    "id": "plus-300",
+    "secret": "synthetic-test-secret",
+    "now": 1700000300,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.plus-300.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "plus-300",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "NX5Rpi5qtGrYdjV6MsV0k_q932VArHHRbUqSsGZnT0k"
+    },
+    "expected": "accept",
+    "wrongAnswer": "exclusive upper boundary"
+  },
+  {
+    "id": "plus-301",
+    "secret": "synthetic-test-secret",
+    "now": 1700000301,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.plus-301.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "plus-301",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "fMCcKccCOdj8fJcb6VxiyYly7Yu-z4x6VY3GIoEgOPQ"
+    },
+    "expected": "request timestamp outside allowed window",
+    "wrongAnswer": "accepting expired/future timestamp"
+  },
+  {
+    "id": "minus-300",
+    "secret": "synthetic-test-secret",
+    "now": 1699999700,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.minus-300.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "minus-300",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "3b_h_Z1125eBoc8Ta7p7QJYR456QALUJM0LEeTb9Jzc"
+    },
+    "expected": "accept",
+    "wrongAnswer": "exclusive lower boundary"
+  },
+  {
+    "id": "minus-301",
+    "secret": "synthetic-test-secret",
+    "now": 1699999699,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.minus-301.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "minus-301",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "ghHSlcpVqFiLcFGG_FnuSHRKgVbCZChcj6hMSogsMjg"
+    },
+    "expected": "request timestamp outside allowed window",
+    "wrongAnswer": "accepting stale timestamp"
+  },
+  {
+    "id": "alternate-compact",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"a\":1,\"b\":2}",
+    "payloadBytesHex": "7b2261223a312c2262223a327d",
+    "signingInput": "1700000000.alternate-compact.eyJhIjoxLCJiIjoyfQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "alternate-compact",
+      "payload": "eyJhIjoxLCJiIjoyfQ",
+      "sig": "6rgufCjw6AiVv0rrKaQyYbd4NvKrLaTCr3s2P5lHFdA"
+    },
+    "expected": "accept",
+    "wrongAnswer": "canonical JSON requirement"
+  },
+  {
+    "id": "alternate-spaced",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{ \"a\": 1, \"b\": 2 }",
+    "payloadBytesHex": "7b202261223a20312c202262223a2032207d",
+    "signingInput": "1700000000.alternate-spaced.eyAiYSI6IDEsICJiIjogMiB9",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "alternate-spaced",
+      "payload": "eyAiYSI6IDEsICJiIjogMiB9",
+      "sig": "t5NRw1pM2o7BTVtsUQ3pBV5PT2FxwvDhcDQMHHfwKxg"
+    },
+    "expected": "accept",
+    "wrongAnswer": "canonical JSON requirement"
+  },
+  {
+    "id": "tampered-payload",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.tampered-payload.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "tampered-payload",
+      "payload": "eyJhY3Rpb24iOiJoZWFsVGgifQ",
+      "sig": "evReI3QIzFnPCqYN8efwl4pxu5qA6JuMGjVmdlKOJGE"
+    },
+    "expected": "bad signature",
+    "wrongAnswer": "checking decoded payload or metadata only"
+  },
+  {
+    "id": "tampered-signature",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.tampered-signature.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "tampered-signature",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "A6Ns_oiKvT9ENJIzlooTLhzYeCo066QgjEEFbsgDu6c"
+    },
+    "expected": "bad signature",
+    "wrongAnswer": "accepting altered MAC"
+  },
+  {
+    "id": "missing-nonce",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.missing-nonce.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "qi_EBM9nz2x-TJwxrl21MQQh-P1xp1zKcZwvQXoODT4"
+    },
+    "expected": "missing nonce",
+    "wrongAnswer": "partially processing missing field"
+  },
+  {
+    "id": "nonfinite-ts",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.nonfinite-ts.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": "NaN",
+      "nonce": "nonfinite-ts",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ",
+      "sig": "pNagJRmRC7piUI9C_a4feTaRLG2IJquux07ybGTP5eU"
+    },
+    "expected": "missing ts",
+    "wrongAnswer": "processing nonfinite timestamp"
+  },
+  {
+    "id": "missing-payload",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.missing-payload.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "missing-payload",
+      "sig": "tHKF9WF1fl4Lju-Z2wfstPdjLWArvfi2fn5hzjG2qrE"
+    },
+    "expected": "missing payload",
+    "wrongAnswer": "processing missing payload"
+  },
+  {
+    "id": "missing-signature",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.missing-signature.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "missing-signature",
+      "payload": "eyJhY3Rpb24iOiJoZWFsdGgifQ"
+    },
+    "expected": "missing sig",
+    "wrongAnswer": "processing unauthenticated payload"
+  },
+  {
+    "id": "nonobject-envelope",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"health\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226865616c7468227d",
+    "signingInput": "1700000000.nonobject-envelope.eyJhY3Rpb24iOiJoZWFsdGgifQ",
+    "envelope": null,
+    "expected": "invalid envelope",
+    "wrongAnswer": "processing a structurally invalid request"
+  },
+  {
+    "id": "legacy-ledgers",
+    "secret": "test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"create_transaction\",\"idempotencyKey\":\"3b241101-e2bb-4255-8caf-4136c566a962\",\"transaction\":{\"type\":\"支出\",\"date\":\"2026-07-26\",\"time\":\"12:30\",\"amount\":260,\"currency\":\"TWD\",\"account\":\"現金\",\"category\":\"食-外食\",\"payee\":\"路易莎\",\"description\":\"午餐\"}}",
+    "payloadBytesHex": "7b22616374696f6e223a226372656174655f7472616e73616374696f6e222c226964656d706f74656e63794b6579223a2233623234313130312d653262622d343235352d386361662d343133366335363661393632222c227472616e73616374696f6e223a7b2274797065223a22e694afe587ba222c2264617465223a22323032362d30372d3236222c2274696d65223a2231323a3330222c22616d6f756e74223a3236302c2263757272656e6379223a22545744222c226163636f756e74223a22e78fbee98791222c2263617465676f7279223a22e9a39f2de5a496e9a39f222c227061796565223a22e8b7afe69893e88e8e222c226465736372697074696f6e223a22e58d88e9a490227d7d",
+    "signingInput": "1700000000.3b241101-e2bb-4255-8caf-4136c566a962.eyJhY3Rpb24iOiJjcmVhdGVfdHJhbnNhY3Rpb24iLCJpZGVtcG90ZW5jeUtleSI6IjNiMjQxMTAxLWUyYmItNDI1NS04Y2FmLTQxMzZjNTY2YTk2MiIsInRyYW5zYWN0aW9uIjp7InR5cGUiOiLmlK_lh7oiLCJkYXRlIjoiMjAyNi0wNy0yNiIsInRpbWUiOiIxMjozMCIsImFtb3VudCI6MjYwLCJjdXJyZW5jeSI6IlRXRCIsImFjY291bnQiOiLnj77ph5EiLCJjYXRlZ29yeSI6Iumjny3lpJbpo58iLCJwYXllZSI6Iui3r-aYk-iOjiIsImRlc2NyaXB0aW9uIjoi5Y2I6aSQIn19",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "3b241101-e2bb-4255-8caf-4136c566a962",
+      "payload": "eyJhY3Rpb24iOiJjcmVhdGVfdHJhbnNhY3Rpb24iLCJpZGVtcG90ZW5jeUtleSI6IjNiMjQxMTAxLWUyYmItNDI1NS04Y2FmLTQxMzZjNTY2YTk2MiIsInRyYW5zYWN0aW9uIjp7InR5cGUiOiLmlK_lh7oiLCJkYXRlIjoiMjAyNi0wNy0yNiIsInRpbWUiOiIxMjozMCIsImFtb3VudCI6MjYwLCJjdXJyZW5jeSI6IlRXRCIsImFjY291bnQiOiLnj77ph5EiLCJjYXRlZ29yeSI6Iumjny3lpJbpo58iLCJwYXllZSI6Iui3r-aYk-iOjiIsImRlc2NyaXB0aW9uIjoi5Y2I6aSQIn19",
+      "sig": "1V4I3O1YucC3QW6Jx-4Hkd6jBDL-mdGFACON0-nGthc"
+    },
+    "signerInput": {
+      "action": "create_transaction",
+      "idempotencyKey": "3b241101-e2bb-4255-8caf-4136c566a962",
+      "transaction": {
+        "type": "支出",
+        "date": "2026-07-26",
+        "time": "12:30",
+        "amount": 260,
+        "currency": "TWD",
+        "account": "現金",
+        "category": "食-外食",
+        "payee": "路易莎",
+        "description": "午餐"
+      }
+    },
+    "expected": "accept",
+    "wrongAnswer": "breaking committed consumer fixture compatibility"
+  },
+  {
+    "id": "legacy-pwa",
+    "secret": "test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"create\",\"expense\":{\"payer\":\"cheng\",\"bearer\":\"平分拆帳\",\"amount\":260,\"currency\":\"TWD\",\"category\":\"食-家庭\",\"description\":\"晚餐\",\"paymentMethod\":\"LINE Pay\"}}",
+    "payloadBytesHex": "7b22616374696f6e223a22637265617465222c22657870656e7365223a7b227061796572223a226368656e67222c22626561726572223a22e5b9b3e58886e68b86e5b8b3222c22616d6f756e74223a3236302c2263757272656e6379223a22545744222c2263617465676f7279223a22e9a39f2de5aeb6e5baad222c226465736372697074696f6e223a22e6999ae9a490222c227061796d656e744d6574686f64223a224c494e4520506179227d7d",
+    "signingInput": "1700000000.3b241101-e2bb-4255-8caf-4136c566a962.eyJhY3Rpb24iOiJjcmVhdGUiLCJleHBlbnNlIjp7InBheWVyIjoiY2hlbmciLCJiZWFyZXIiOiLlubPliIbmi4bluLMiLCJhbW91bnQiOjI2MCwiY3VycmVuY3kiOiJUV0QiLCJjYXRlZ29yeSI6Iumjny3lrrbluq0iLCJkZXNjcmlwdGlvbiI6IuaZmumkkCIsInBheW1lbnRNZXRob2QiOiJMSU5FIFBheSJ9fQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "3b241101-e2bb-4255-8caf-4136c566a962",
+      "payload": "eyJhY3Rpb24iOiJjcmVhdGUiLCJleHBlbnNlIjp7InBheWVyIjoiY2hlbmciLCJiZWFyZXIiOiLlubPliIbmi4bluLMiLCJhbW91bnQiOjI2MCwiY3VycmVuY3kiOiJUV0QiLCJjYXRlZ29yeSI6Iumjny3lrrbluq0iLCJkZXNjcmlwdGlvbiI6IuaZmumkkCIsInBheW1lbnRNZXRob2QiOiJMSU5FIFBheSJ9fQ",
+      "sig": "JWjK0sEG8i7zcyx5mp3L8HgVugFVb3PFokS4gaxxn8U"
+    },
+    "signerInput": {
+      "action": "create",
+      "expense": {
+        "payer": "cheng",
+        "bearer": "平分拆帳",
+        "amount": 260,
+        "currency": "TWD",
+        "category": "食-家庭",
+        "description": "晚餐",
+        "paymentMethod": "LINE Pay"
+      }
+    },
+    "expected": "accept",
+    "wrongAnswer": "breaking committed consumer fixture compatibility"
+  }
+]

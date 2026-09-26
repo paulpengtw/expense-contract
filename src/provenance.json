@@ -1,0 +1,50 @@
+{
+  "signerSha256": "4ca9804c722fce50ccfc03694d8713bbcd9f16455475bc534a6e068f8d3ac370",
+  "sourcePaths": [
+    "partner-ledger/apps-script/Code.gs",
+    "solo-ledger/apps-script/Code.gs"
+  ],
+  "sharedFunctionBodies": {
+    "doPost": "3d7a124656565896194329985a7a79d27806b10c2b344b68cf28ca22feb07f8b",
+    "verifyEnvelope_": "1c35731206a9a32390d9606115d66785f35bf9eb0f266df0a5d95d608c73ee62",
+    "schemaVersion_": "186388232566e8347c8deb44f8a867f92c5dfa37fda6989e60723ce5786e61d5",
+    "digestHex_": "fe36c9065d3233cd2fe67c5c56c80233fd446f657a66280e675cc5a049c88c89",
+    "normalizedAmount_": "cbc84d74f418f949b8e865cea6e106934d4b7248ebd8c77dd06829417687a0e6",
+    "findTxnRow_": "c189f9efaa8d312111a869c00ca0d6c7e133279fd5d02e06073995e92799923e",
+    "requiredSheet_": "23e0761c3c7678573640f89446984adc9e9352b469f8612416b050e4c5d14486",
+    "withAlready_": "58ba1dec2af3f17827e5e213c0a6aa2f52108bd18b9d50d6725be8cf293994f3",
+    "taipeiIsoNow_": "561c322775d75395ef3b94cdec358f0bea348da24820947cdbeef566092f42e4",
+    "requiredProp_": "d59b7857cf958cddcde6e4cd6b9021018b92086e509052c924c4526d96fc7076",
+    "json_": "e26f81ad861c2bf777dcb40fd0c4df55d3fe7986c6b7c499b853f4ad59e1322a",
+    "base64UrlEncode_": "3c3776f24c8155141b66ace7c4eb3665e559be1226d53bf7f33f940deb3b96ca",
+    "base64UrlDecode_": "62b42e3817b7d50a1b4a38c910f361a470a40b2b8a67e7a2e354c14b77a7f4a7",
+    "constantTimeEqual_": "db822a8004dde2aa91ec079ad16d793f0ad15559a6f710b82ff7487012a79b6c",
+    "resolveHeaders_": "7c00676df85f3a4fb5305ba76919bcbf28c47b23d94a27b6ea054745017d191d",
+    "weeklyBackup": "297ed59d1076e835cf38d22988dbafdd2dd7f41b89128903a37d20bcabdb7873",
+    "backupFolder_": "8850b01f41daa35c532ddd1c28cf44970d5ca41ca49ae01298a5594b99a81c3c",
+    "pruneBackups_": "5ca03713b63e7bfd7580d3f94b98bf56368cd686584bf99f360c4c604a04f30e",
+    "getOrCreateSheet_": "aa95cb9fea7ea1c20a47201873d0c6aa69c34b81b16b0e0b7bb49fa88a8e90eb",
+    "initializeBlankSheet_": "b866c0946ab2f497ed1b1e841e6afff0ea51888ea30db13249c23fb114477653",
+    "requireField_": "d681772c4df7720d937c75a0486ab33c99bf329c32316a39211fbf5fb771bfdc",
+    "hasField_": "72dc401ba7e27e489ce812302bc66970e3e8481d24a2cfad8fd158a501459867",
+    "validatePositiveAmount_": "8f295a077101f650b54bb4298396bdf8661bc0473c992f0c1ed3a5f614139831",
+    "blank_": "a708da7b2ae5cb6a5a4a34c74797400a8f4f78a1f0786f860771e0071a472f33"
+  },
+  "divergentSameNameFunctions": [
+    "createTransaction_",
+    "getOptions_",
+    "health_",
+    "installWeeklyTriggers",
+    "listTransactions_",
+    "reverseTransaction_",
+    "route_",
+    "settle_",
+    "setupSpreadsheet"
+  ],
+  "sourceRevisions": {
+    "partner-ledger": "e05760808519111abf067cc8fe60f221f6b4df60",
+    "solo-ledger": "714ee30c61cb65b7f91cc35c444aca7ff5a72e0a",
+    "expense-pwa": "51b55b77f773e13fb0a8dd5e7896bf56f7502fab"
+  },
+  "pwaSignerSha256": "4ca9804c722fce50ccfc03694d8713bbcd9f16455475bc534a6e068f8d3ac370"
+}
