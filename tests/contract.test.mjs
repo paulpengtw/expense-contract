@@ -71,6 +71,14 @@ test('source-backed ordered headers and field shapes reject excluded or mistyped
   assert.equal(assertShape('solo-ledger','Transaction',{type:'支出',amount:25,date:'2026-01-01',description:'test',account:'dynamic name'}),true)
   assert.equal(assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'dynamic category',description:'test'}),true)
   assert.throws(()=>assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'x',description:'test',paymentMethod:5}),/invalid paymentMethod/)
+  for(const consumer of CONSUMERS) for(const inherited of ['toString','constructor','__proto__']) {
+    assert.throws(()=>assertShape(consumer,inherited,{}),/outside/)
+  }
+  assert.throws(()=>assertShape('expense-pwa','unknown',{}),/shape unknown is outside expense-pwa vocabulary/)
+  assert.throws(()=>assertShape('__proto__','toString',{}),/outside/)
+  assert.throws(()=>requireTerm('__proto__','payer'),/outside/)
+  assert.throws(()=>assertShape('toString','Expense',{}),/outside/)
+  assert.throws(()=>requireTerm('constructor','payer'),/outside/)
 })
 
 test('generation is deterministic and GAS has no module imports',()=>{

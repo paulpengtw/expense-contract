@@ -59,15 +59,17 @@ export const CONSUMER_SHAPES = {
 } as const
 
 export function requireTerm(consumer: Consumer, term: string): string {
+  if (!Object.hasOwn(CONSUMER_TERMS, consumer)) throw new Error(`consumer ${consumer} is outside contract inventory`)
   if (!CONSUMER_TERMS[consumer].includes(term)) throw new Error(`term ${term} is outside ${consumer} vocabulary`)
   return term
 }
 
 /** Strict projection check for contract fields. Dynamic option values are not constrained here. */
 export function assertShape(consumer: Consumer, shapeName: string, value: unknown): true {
+  if (!Object.hasOwn(CONSUMER_SHAPES, consumer)) throw new Error(`consumer ${consumer} is outside contract inventory`)
   const shapes = CONSUMER_SHAPES[consumer] as Record<string, Record<string, {kind: string; optional?: boolean; values?: readonly string[]}>>
+  if (!Object.hasOwn(shapes, shapeName)) throw new Error(`shape ${shapeName} is outside ${consumer} vocabulary`)
   const fields = shapes[shapeName]
-  if (!fields) throw new Error(`shape ${shapeName} is outside ${consumer} vocabulary`)
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`invalid ${shapeName}`)
   const input = value as Record<string, unknown>
   for (const name of Object.keys(input)) if (!Object.hasOwn(fields, name)) throw new Error(`field ${name} is outside ${consumer} ${shapeName}`)
