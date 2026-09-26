@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { CONSUMERS } from '../model/consumers.ts'
-import { CONSUMER_TERMS, PARTNER_SPLIT_MODES, SOLO_TRANSACTION_TYPES, SOLO_IOU_TYPES } from '../model/vocabulary.ts'
+import { CONSUMER_TERMS, CONSUMER_SHAPES, PARTNER_SPLIT_MODES, SOLO_TRANSACTION_TYPES, SOLO_IOU_TYPES, PARTNER_ENTRY_HEADERS, SOLO_JOURNAL_HEADERS, WEB_DETAIL_HEADER, WEB_ACCOUNT_HEADER } from '../model/vocabulary.ts'
 import { ENVELOPE } from '../model/envelope.ts'
 
 const signer = readFileSync(new URL('../src/envelope.ts', import.meta.url),'utf8')
@@ -15,6 +15,12 @@ function bodyOf(name) {
   return verifier.slice(start,next < 0 ? undefined : next).trimEnd()
 }
 const wire = wireNames.map(bodyOf).join('\n\n') + '\n'
+function shapeType(fields) {
+  return '{\n' + Object.entries(fields).map(([name, rule]) => {
+    const type = rule.kind === 'enum' ? rule.values.map(quoted).join(' | ') : rule.kind
+    return `  ${quoted(name)}${rule.optional ? '?' : ''}: ${type}\n`
+  }).join('') + '}\n'
+}
 export function expectedArtifacts() {
   const out = new Map()
   for (const consumer of CONSUMERS) {
@@ -22,6 +28,10 @@ export function expectedArtifacts() {
     let terms = header + `export const TERMS = ${quoted(CONSUMER_TERMS[consumer])} as const\nexport type Term = typeof TERMS[number]\n`
     if (consumer === 'partner-ledger') terms += `export const SPLIT_MODES = ${quoted(PARTNER_SPLIT_MODES)} as const\n`
     if (consumer === 'solo-ledger') terms += `export const TRANSACTION_TYPES = ${quoted(SOLO_TRANSACTION_TYPES)} as const\nexport const IOU_TYPES = ${quoted(SOLO_IOU_TYPES)} as const\n`
+    if (consumer === 'partner-ledger') terms += `export const ENTRY_HEADERS = ${quoted(PARTNER_ENTRY_HEADERS)} as const\n`
+    if (consumer === 'solo-ledger') terms += `export const JOURNAL_HEADERS = ${quoted(SOLO_JOURNAL_HEADERS)} as const\n`
+    if (consumer === 'web') terms += `export const DETAIL_HEADER = ${quoted(WEB_DETAIL_HEADER)} as const\nexport const ACCOUNT_HEADER = ${quoted(WEB_ACCOUNT_HEADER)} as const\n`
+    for (const [name, fields] of Object.entries(CONSUMER_SHAPES[consumer])) terms += `export type ${name} = ${shapeType(fields)}`
     out.set(`generated/${consumer}/vocabulary.ts`, terms)
     if (consumer.endsWith('-ledger')) {
       out.set(`generated/${consumer}/Contract.gs`, header + `var MAX_SKEW_SECONDS = ${ENVELOPE.maxSkewSeconds};\n\n` + wire)

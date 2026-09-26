@@ -2,3 +2,12 @@
 export const TERMS = ["txn_id","日期","金額","分類","交易對象","來源","沖銷txn_id","付款人","分攤方式","記帳人"] as const
 export type Term = typeof TERMS[number]
 export const SPLIT_MODES = ["這筆平分","幫狗狗付","幫自己付"] as const
+export const ENTRY_HEADERS = ["txn_id","日期","金額","付款人","分攤方式","分類","交易對象","記帳人","來源","沖銷txn_id"] as const
+export type Transaction = {
+  "date": string
+  "amount": number
+  "payer": string
+  "split": "這筆平分" | "幫狗狗付" | "幫自己付"
+  "category": string
+  "payee"?: string
+}

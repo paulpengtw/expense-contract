@@ -6,7 +6,7 @@ import vm from 'node:vm'
 import { buildEnvelope } from '../src/envelope.ts'
 import { CONSUMERS } from '../model/consumers.ts'
 import { ENVELOPE } from '../model/envelope.ts'
-import { CONSUMER_TERMS, PARTNER_SPLIT_MODES, SOLO_TRANSACTION_TYPES, SOLO_IOU_TYPES, requireTerm } from '../model/vocabulary.ts'
+import { CONSUMER_TERMS, PARTNER_SPLIT_MODES, SOLO_TRANSACTION_TYPES, SOLO_IOU_TYPES, PARTNER_ENTRY_HEADERS, SOLO_JOURNAL_HEADERS, WEB_DETAIL_HEADER, WEB_ACCOUNT_HEADER, assertShape, requireTerm } from '../model/vocabulary.ts'
 import { expectedArtifacts } from '../generators/emit.mjs'
 import { MemoryDurableAdapter, protectedEffect } from '../src/nonce.ts'
 
@@ -31,7 +31,7 @@ function verifier(now, secret, body=source) {
   return context
 }
 
-test('source provenance retains the one signer and 24 unchanged GAS bodies',()=>{
+test('internal provenance digests retain the signer and 24 shared GAS bodies',()=>{
   const p=JSON.parse(readFileSync(new URL('../src/provenance.json',import.meta.url)))
   const signer=readFileSync(new URL('../src/envelope.ts',import.meta.url))
   assert.equal(createHash('sha256').update(signer).digest('hex'),p.signerSha256)
@@ -53,6 +53,26 @@ test('four consumer subsets exclude each other’s unique vocabulary',()=>{
   assert.deepEqual(SOLO_IOU_TYPES,['應收','應付'])
 })
 
+test('source-backed ordered headers and field shapes reject excluded or mistyped fields',()=>{
+  assert.deepEqual(PARTNER_ENTRY_HEADERS,['txn_id','日期','金額','付款人','分攤方式','分類','交易對象','記帳人','來源','沖銷txn_id'])
+  assert.equal(SOLO_JOURNAL_HEADERS.length,15)
+  assert.equal(WEB_DETAIL_HEADER.length,13)
+  assert.equal(WEB_ACCOUNT_HEADER.length,7)
+  const detail=Object.fromEntries(WEB_DETAIL_HEADER.map(name=>[name,'']))
+  assert.equal(assertShape('web','DetailRow',detail),true)
+  assert.throws(()=>assertShape('web','DetailRow',{...detail,'金額':25}),/invalid 金額/)
+  assert.throws(()=>assertShape('web','DetailRow',{...detail,'付款人':'someone'}),/outside/)
+  const partner={date:'2026-01-01',amount:25,payer:'someone',split:'這筆平分',category:'餐飲'}
+  assert.equal(assertShape('partner-ledger','Transaction',partner),true)
+  assert.throws(()=>assertShape('partner-ledger','Transaction',{...partner,split:'wrong'}),/invalid split/)
+  assert.throws(()=>assertShape('partner-ledger','Transaction',{...partner,amount:'25'}),/invalid amount/)
+  assert.throws(()=>assertShape('partner-ledger','Transaction',{...partner,'借方帳戶':'cash'}),/outside/)
+  assert.throws(()=>assertShape('solo-ledger','Transaction',partner),/invalid type|outside/)
+  assert.equal(assertShape('solo-ledger','Transaction',{type:'支出',amount:25,date:'2026-01-01',description:'test',account:'dynamic name'}),true)
+  assert.equal(assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'dynamic category',description:'test'}),true)
+  assert.throws(()=>assertShape('expense-pwa','Expense',{payer:'person',bearer:'split',amount:25,currency:'TWD',category:'x',description:'test',paymentMethod:5}),/invalid paymentMethod/)
+})
+
 test('generation is deterministic and GAS has no module imports',()=>{
   const once=expectedArtifacts(), twice=expectedArtifacts()
   assert.deepEqual([...once],[...twice])
@@ -66,6 +86,10 @@ test('generation is deterministic and GAS has no module imports',()=>{
   assert.doesNotMatch(once.get('generated/solo-ledger/vocabulary.ts'),/分攤方式/)
   assert.match(once.get('generated/partner-ledger/vocabulary.ts'),/SPLIT_MODES/)
   assert.match(once.get('generated/solo-ledger/vocabulary.ts'),/TRANSACTION_TYPES/)
+  assert.match(once.get('generated/partner-ledger/vocabulary.ts'),/export type Transaction/)
+  assert.match(once.get('generated/solo-ledger/vocabulary.ts'),/"iou"\?:/)
+  assert.match(once.get('generated/expense-pwa/vocabulary.ts'),/export type Expense/)
+  assert.match(once.get('generated/web/vocabulary.ts'),/export type DetailRow/)
   assert.deepEqual(JSON.parse(vectors.find(x=>x.id==='alternate-compact').payloadUtf8),JSON.parse(vectors.find(x=>x.id==='alternate-spaced').payloadUtf8))
   for(const consumer of ['partner-ledger','solo-ledger']){
     const gas=once.get(`generated/${consumer}/Contract.gs`)
@@ -82,11 +106,20 @@ test('generation is deterministic and GAS has no module imports',()=>{
   }
 })
 
+test('generated TypeScript projections parse under the declared Node toolchain',async()=>{
+  for(const consumer of CONSUMERS){
+    const vocabulary=await import(`../generated/${consumer}/vocabulary.ts`)
+    const envelope=await import(`../generated/${consumer}/envelope.ts`)
+    assert.ok(Array.isArray(vocabulary.TERMS))
+    assert.equal(typeof envelope.buildEnvelope,'function')
+  }
+})
+
 test('fixed vectors exercise original signer and original GAS verifier',async(t)=>{
   for(const v of vectors) await t.test(v.id,async()=>{
     assert.ok(v.wrongAnswer)
     assert.equal(Buffer.from(v.payloadBytesHex,'hex').toString('utf8'),v.payloadUtf8)
-    if(v.expected==='accept'){
+    if(v.expected==='accept' || v.expected==='invalid payload JSON'){
       assert.equal(`${v.envelope.ts}.${v.envelope.nonce}.${v.envelope.payload}`,v.signingInput)
       assert.equal(Buffer.from(v.envelope.payload,'base64url').toString('hex'),v.payloadBytesHex)
       assert.equal(createHmac('sha256',v.secret).update(v.signingInput).digest('base64url'),v.envelope.sig)
@@ -98,14 +131,45 @@ test('fixed vectors exercise original signer and original GAS verifier',async(t)
       assert.equal(actual.nonce,v.envelope.nonce)
       if(v.signerInput){assert.deepEqual(await buildEnvelope(v.secret,v.signerInput,v.envelope.ts,v.envelope.nonce),v.envelope)}
       else if(JSON.stringify(JSON.parse(v.payloadUtf8))===v.payloadUtf8){assert.deepEqual(await buildEnvelope(v.secret,JSON.parse(v.payloadUtf8),v.envelope.ts,v.envelope.nonce),v.envelope)}
-    }else assert.throws(()=>gas.verifyEnvelope_(v.envelope),new RegExp(v.expected))
+    }else if(v.expected==='invalid payload JSON') assert.throws(()=>gas.verifyEnvelope_(v.envelope),error=>error.name==='SyntaxError' && /JSON/.test(error.message))
+    else assert.throws(()=>gas.verifyEnvelope_(v.envelope),new RegExp(v.expected))
   })
+})
+
+test('fixed signed replay passes through production verifier and durable model once',async()=>{
+  const vector=vectors.find(x=>x.id==='signed-replay')
+  assert.ok(vector)
+  assert.equal(vector.deliveries,2)
+  const gas=verifier(vector.now,vector.secret)
+  const adapter=new MemoryDurableAdapter()
+  let effects=0
+  const results=[]
+  for(let index=0;index<vector.deliveries;index++) {
+    const verified=gas.verifyEnvelope_(vector.envelope)
+    results.push(await protectedEffect(adapter,verified.nonce,async()=>{effects++;return {txnId:verified.nonce}}))
+  }
+  assert.deepEqual(results.map(x=>x.kind),vector.expectedDuplicateOutcomes)
+  assert.equal(effects,1)
+})
+
+test('an undefined prior result still has a durable duplicate key',async()=>{
+  const adapter=new MemoryDurableAdapter()
+  let commits=0
+  const prepare=async()=>{commits++;return undefined}
+  assert.deepEqual(await protectedEffect(adapter,'undefined-result',prepare),{kind:'applied',value:undefined})
+  assert.deepEqual(await protectedEffect(adapter,'undefined-result',prepare),{kind:'already',value:undefined})
+  assert.equal(adapter.records.has('undefined-result'),true)
+  assert.equal(commits,1)
 })
 
 test('doPost calls the same verifier function and wraps refusal',()=>{
   const v=vectors.find(x=>x.id==='health'), gas=verifier(v.now,v.secret)
   assert.equal(JSON.parse(gas.doPost({postData:{contents:JSON.stringify(v.envelope)}}).text).ok,true)
   assert.match(gas.doPost({postData:{contents:'{}'}}).text,/missing ts/)
+  const malformed=vectors.find(x=>x.id==='signed-malformed-json')
+  const refusal=JSON.parse(gas.doPost({postData:{contents:JSON.stringify(malformed.envelope)}}).text)
+  assert.equal(refusal.ok,false)
+  assert.match(refusal.error,/JSON/)
 })
 
 test('durable adapter serializes concurrent duplicate check and effect',async()=>{

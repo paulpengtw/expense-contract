@@ -232,6 +232,43 @@
     "wrongAnswer": "processing a structurally invalid request"
   },
   {
+    "id": "signed-malformed-json",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":",
+    "payloadBytesHex": "7b22616374696f6e223a",
+    "signingInput": "1700000000.signed-malformed-json.eyJhY3Rpb24iOg",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "signed-malformed-json",
+      "payload": "eyJhY3Rpb24iOg",
+      "sig": "so5usDNXDHSjuqufHR2k1BTZ_fQJb8wHfLTzLQGp8oY"
+    },
+    "expected": "invalid payload JSON",
+    "wrongAnswer": "accepting authenticated bytes that cannot be parsed"
+  },
+  {
+    "id": "signed-replay",
+    "secret": "synthetic-test-secret",
+    "now": 1700000000,
+    "payloadUtf8": "{\"action\":\"create_transaction\",\"idempotencyKey\":\"signed-replay\"}",
+    "payloadBytesHex": "7b22616374696f6e223a226372656174655f7472616e73616374696f6e222c226964656d706f74656e63794b6579223a227369676e65642d7265706c6179227d",
+    "signingInput": "1700000000.signed-replay.eyJhY3Rpb24iOiJjcmVhdGVfdHJhbnNhY3Rpb24iLCJpZGVtcG90ZW5jeUtleSI6InNpZ25lZC1yZXBsYXkifQ",
+    "envelope": {
+      "ts": 1700000000,
+      "nonce": "signed-replay",
+      "payload": "eyJhY3Rpb24iOiJjcmVhdGVfdHJhbnNhY3Rpb24iLCJpZGVtcG90ZW5jeUtleSI6InNpZ25lZC1yZXBsYXkifQ",
+      "sig": "BfSsJcqY0ixFT7Q37Hf8hmxboWlHt6gg0KtFYC97kb8"
+    },
+    "expected": "accept",
+    "wrongAnswer": "executing a repeated signed nonce twice",
+    "deliveries": 2,
+    "expectedDuplicateOutcomes": [
+      "applied",
+      "already"
+    ]
+  },
+  {
     "id": "legacy-ledgers",
     "secret": "test-secret",
     "now": 1700000000,

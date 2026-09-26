@@ -12,6 +12,7 @@
     "generate": "node generators/generate.mjs",
     "vectors:author": "node vectors/author.mjs",
     "mutations": "node scripts/mutation-check.mjs",
-    "ci": "npm ci --ignore-scripts && npm run check && npm test && npm run mutations"
+    "ci": "npm ci --ignore-scripts && npm run check && npm run verify:generate && npm test && npm run mutations",
+    "verify:generate": "node scripts/verify-generation.mjs"
   }
 }

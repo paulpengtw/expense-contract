@@ -1,20 +1,11 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-const required = readFileSync(new URL('../.nvmrc',import.meta.url),'utf8').trim()
-if (process.version !== `v${required}`) throw new Error(`TOOLCHAIN CONFIGURATION ERROR: expected Node ${required}, got ${process.version}`)
+import { assertSourceAgreement } from './preflight.mjs'
+const { CONSUMERS } = await assertSourceAgreement()
 const { expectedArtifacts } = await import('../generators/emit.mjs')
-const { ENVELOPE } = await import('../model/envelope.ts')
-const { CONSUMERS } = await import('../model/consumers.ts')
-const { CONSUMER_TERMS, PARTNER_SPLIT_MODES, SOLO_TRANSACTION_TYPES, SOLO_IOU_TYPES } = await import('../model/vocabulary.ts')
-const spec=readFileSync(new URL('../spec/envelope.md',import.meta.url),'utf8')
-for(const [key,value] of Object.entries(ENVELOPE)) {
-  const rows=[...spec.matchAll(new RegExp('^\\| `'+key+'` \\| (\\d+) \\|','gm'))]
-  if(rows.length!==1 || Number(rows[0][1])!==value) throw new Error(`SPEC MODEL MISMATCH: ${key} prose=${rows[0]?.[1]??'missing/duplicate'} model=${value}`)
-}
-const vocab=readFileSync(new URL('../spec/vocabulary.md',import.meta.url),'utf8')
-for(const c of CONSUMERS) for(const term of CONSUMER_TERMS[c]) if(!vocab.includes('`'+term+'`')) throw new Error(`VOCABULARY SPEC MISMATCH: ${c} ${term}`)
-for(const term of [...PARTNER_SPLIT_MODES,...SOLO_TRANSACTION_TYPES,...SOLO_IOU_TYPES]) if(!vocab.includes('`'+term+'`')) throw new Error(`VOCABULARY SPEC MISMATCH: ${term}`)
 const digests=JSON.parse(readFileSync(new URL('../vectors/digests.json',import.meta.url)))
+const vectorFiles=readdirSync('vectors').filter(name=>name.endsWith('.json') && name!=='digests.json').sort()
+if(JSON.stringify(vectorFiles)!==JSON.stringify(Object.keys(digests).sort())) throw new Error('VECTOR DIGEST MISMATCH: manifest coverage')
 for(const [name,want] of Object.entries(digests)) {
   const body=readFileSync(new URL(`../vectors/${name}`,import.meta.url))
   const got=createHash('sha256').update(body).digest('hex')

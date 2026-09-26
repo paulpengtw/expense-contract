@@ -3,3 +3,17 @@ export const TERMS = ["txn_id","日期","金額","分類","交易對象","來源
 export type Term = typeof TERMS[number]
 export const TRANSACTION_TYPES = ["支出","收入","轉帳"] as const
 export const IOU_TYPES = ["應收","應付"] as const
+export const JOURNAL_HEADERS = ["日期","時間","類型","借方帳戶","貸方帳戶","金額","幣別","分類","交易對象","說明","結清狀態","沖銷txn_id","txn_id","來源","建立時間"] as const
+export type Transaction = {
+  "type": "支出" | "收入" | "轉帳"
+  "amount": number
+  "date": string
+  "description": string
+  "time"?: string
+  "account"?: string
+  "toAccount"?: string
+  "category"?: string
+  "payee"?: string
+  "currency"?: string
+  "iou"?: "應收" | "應付"
+}

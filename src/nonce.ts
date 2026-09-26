@@ -2,7 +2,7 @@
 import { ENVELOPE } from '../model/envelope.ts'
 export interface DurableAdapter<T> {
   exclusive<R>(work: () => Promise<R>): Promise<R>
-  read(key: string): Promise<T | undefined>
+  read(key: string): Promise<{ found: false } | { found: true; value: T }>
   /** Commit the effect and its duplicate key in the same durable record. prepare must not perform external writes. */
   commit(key: string, prepare: () => Promise<T>): Promise<T>
 }
@@ -15,7 +15,7 @@ export async function protectedEffect<T>(
   if (!key) throw new Error('missing duplicate key')
   return adapter.exclusive(async () => {
     const prior = await adapter.read(key)
-    if (prior !== undefined) return { kind: 'already', value: prior }
+    if (prior.found) return { kind: 'already', value: prior.value }
     const value = await adapter.commit(key, prepare)
     return { kind: 'applied', value }
   })
@@ -45,9 +45,9 @@ export class MemoryDurableAdapter<T> implements DurableAdapter<T> {
     await previous
     try { return await work() } finally { release() }
   }
-  async read(key: string): Promise<T | undefined> {
+  async read(key: string): Promise<{ found: false } | { found: true; value: T }> {
     if (this.failRead) throw new Error('durable read unavailable')
-    return this.records.get(key)
+    return this.records.has(key) ? { found: true, value: this.records.get(key) as T } : { found: false }
   }
   cached(key: string): T | undefined {
     if ((this.cacheExpiry.get(key) ?? -Infinity) <= this.clock()) return undefined
