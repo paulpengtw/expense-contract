@@ -2,7 +2,7 @@
 export const TERMS = ["金融機構/手動新增","身分證字號","機構名稱","帳戶名稱","分類","明細描述","幣別","金額","消費日","入帳日","標籤","備註","帳戶停用時間","信用額度","帳戶金額","可用額度"] as const
 export type Term = typeof TERMS[number]
 export const DETAIL_HEADER = ["金融機構/手動新增","身分證字號","機構名稱","帳戶名稱","分類","明細描述","幣別","金額","消費日","入帳日","標籤","備註","帳戶停用時間"] as const
-export const ACCOUNT_HEADER = ["機構名稱","帳戶名稱","幣別","信用額度","帳戶金額","可用額度","帳戶停用時間"] as const
+export const ACCOUNT_HEADER = ["金融機構/手動新增","身分證字號","機構名稱","帳戶名稱","幣別","信用額度","帳戶金額","可用額度","帳戶停用時間"] as const
 export type DetailRow = {
   "金融機構/手動新增": string
   "身分證字號": string
@@ -19,6 +19,8 @@ export type DetailRow = {
   "帳戶停用時間": string
 }
 export type AccountRow = {
+  "金融機構/手動新增": string
+  "身分證字號": string
   "機構名稱": string
   "帳戶名稱": string
   "幣別": string

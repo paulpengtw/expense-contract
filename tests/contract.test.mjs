@@ -57,7 +57,7 @@ test('source-backed ordered headers and field shapes reject excluded or mistyped
   assert.deepEqual(PARTNER_ENTRY_HEADERS,['txn_id','日期','金額','付款人','分攤方式','分類','交易對象','記帳人','來源','沖銷txn_id'])
   assert.equal(SOLO_JOURNAL_HEADERS.length,15)
   assert.equal(WEB_DETAIL_HEADER.length,13)
-  assert.equal(WEB_ACCOUNT_HEADER.length,7)
+  assert.equal(WEB_ACCOUNT_HEADER.length,9)
   const detail=Object.fromEntries(WEB_DETAIL_HEADER.map(name=>[name,'']))
   assert.equal(assertShape('web','DetailRow',detail),true)
   assert.throws(()=>assertShape('web','DetailRow',{...detail,'金額':25}),/invalid 金額/)
