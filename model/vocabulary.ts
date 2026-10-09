@@ -2,14 +2,14 @@ import type { Consumer } from './consumers.ts'
 
 /** Ordered source headers. Category/account values remain live sheet data. */
 export const PARTNER_ENTRY_HEADERS = ['txn_id', '日期', '金額', '付款人', '分攤方式', '分類', '交易對象', '記帳人', '來源', '沖銷txn_id'] as const
-export const SOLO_JOURNAL_HEADERS = ['日期', '時間', '類型', '借方帳戶', '貸方帳戶', '金額', '幣別', '分類', '交易對象', '說明', '結清狀態', '沖銷txn_id', 'txn_id', '來源', '建立時間'] as const
+export const SOLO_JOURNAL_HEADERS = ['日期', '時間', '類型', '借方帳戶', '貸方帳戶', '金額', '幣別', '分類', '交易對象', '說明', '結清狀態', '沖銷txn_id', '換匯txn_id', 'txn_id', '來源', '建立時間'] as const
 export const WEB_DETAIL_HEADER = ['金融機構/手動新增', '身分證字號', '機構名稱', '帳戶名稱', '分類', '明細描述', '幣別', '金額', '消費日', '入帳日', '標籤', '備註', '帳戶停用時間'] as const
 export const WEB_ACCOUNT_HEADER = ['金融機構/手動新增', '身分證字號', '機構名稱', '帳戶名稱', '幣別', '信用額度', '帳戶金額', '可用額度', '帳戶停用時間'] as const
 
 /** Unordered names for supported projections. */
 export const COMMON_TERMS = ['txn_id', '日期', '金額', '分類', '交易對象', '來源', '沖銷txn_id'] as const
 export const PARTNER_TERMS = ['付款人', '分攤方式', '記帳人'] as const
-export const SOLO_TERMS = ['時間', '類型', '借方帳戶', '貸方帳戶', '幣別', '說明', '結清狀態', '建立時間'] as const
+export const SOLO_TERMS = ['時間', '類型', '借方帳戶', '貸方帳戶', '幣別', '說明', '結清狀態', '換匯txn_id', '建立時間'] as const
 export const WEB_TERMS = [...new Set([...WEB_DETAIL_HEADER, ...WEB_ACCOUNT_HEADER])] as const
 export const PARTNER_SPLIT_MODES = ['這筆平分', '幫狗狗付', '幫自己付'] as const
 export const SOLO_TRANSACTION_TYPES = ['支出', '收入', '轉帳'] as const
